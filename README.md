@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # ResuMatch ATS Studio 🎯
 ### AI & NLP-Powered Resume Optimizer & Job Description ATS Matcher
 
@@ -77,3 +78,6 @@ Open your browser at: [http://localhost:5173](http://localhost:5173)
 - `POST /api/optimize-resume`: JSON payload returning tailored summary, STAR bullet points, updated skills, and complete tailored resume.
 - `POST /api/export-docx`: Generates a downloadable ATS-formatted `.docx` file.
 - `GET /api/health`: Healthcheck endpoint.
+=======
+# ATS
+>>>>>>> 9cecce1aaa606409ccab5db6c76ca9e1dafc7ab5
