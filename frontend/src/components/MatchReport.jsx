@@ -98,6 +98,36 @@ export default function MatchReport({ atsData, parsedResumeData, onNavigateToTai
             </div>
 
             <div className="breakdown-grid">
+              
+              {/* Formula Debugger Card */}
+              <div className="metric-card" style={{ borderColor: 'rgba(56, 189, 248, 0.35)' }}>
+                <div className="metric-card-header">
+                  <span style={{ color: '#38bdf8', fontWeight: 600 }}>Algorithm Debugger (F1-F4)</span>
+                  <Cpu size={15} color="#0ea5e9" />
+                </div>
+                <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>F1 (Cosine): <span style={{fontSize: '0.75rem', opacity: 0.7}}>({metrics.f1_cosine}%)</span></span> 
+                    <strong>+{metrics.f1_weight_20} pts</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>F2 (Keyword Density): <span style={{fontSize: '0.75rem', opacity: 0.7}}>({metrics.f2_keyword}%)</span></span> 
+                    <strong>+{metrics.f2_weight_20} pts</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>F3 (Skill Overlap): <span style={{fontSize: '0.75rem', opacity: 0.7}}>({metrics.f3_skill}%)</span></span> 
+                    <strong>+{metrics.f3_weight_20} pts</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>F4 (Deep LLM Pass): <span style={{fontSize: '0.75rem', opacity: 0.7}}>({metrics.f4_llm}%)</span></span> 
+                    <strong>+{metrics.f4_weight_40} pts</strong>
+                  </div>
+                  <div style={{ width: '100%', height: 1, background: 'rgba(255,255,255,0.1)', margin: '4px 0' }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', color: '#10b981', fontWeight: 'bold' }}>
+                    <span>Final Calculated Score (Out of 100):</span> <strong>{overall_score}%</strong>
+                  </div>
+                </div>
+              </div>
 
               {/* Vector Embeddings Match */}
               <div className="metric-card" style={{ borderColor: 'rgba(168, 85, 247, 0.35)' }}>

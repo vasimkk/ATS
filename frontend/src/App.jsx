@@ -148,7 +148,7 @@ export default function App() {
 
   const handleTargetRole = async (jobInfo) => {
     setJdText(jobInfo.text);
-    
+
     setIsAnalyzing(true);
     setErrorMsg(null);
 
@@ -189,10 +189,7 @@ export default function App() {
 
       {/* Hero Header */}
       <section className="hero-banner">
-        <div className="hero-pill">
-          <Sparkles size={14} />
-          <span>ATS Algorithm & Keyword Optimization Engine</span>
-        </div>
+
         <h2 className="hero-title">
           Align Your Resume with Any <br />
           <span className="gradient-highlight">Target Job Description</span>
@@ -211,15 +208,15 @@ export default function App() {
           style={{ background: 'linear-gradient(135deg, #a855f7, #6366f1)' }}
         >
           {isBatchAnalyzing ? (
-             <>
-               <div className="spinner" style={{ width: 18, height: 18, border: '2px solid #fff', borderTopColor: 'transparent', borderRadius: '50%' }} />
-               Scanning Job Database...
-             </>
+            <>
+              <div className="spinner" style={{ width: 18, height: 18, border: '2px solid #fff', borderTopColor: 'transparent', borderRadius: '50%' }} />
+              Scanning Job Database...
+            </>
           ) : (
-             <>
-               <Sparkles size={18} />
-               Find Recommended Jobs
-             </>
+            <>
+              <Sparkles size={18} />
+              Find Recommended Jobs
+            </>
           )}
         </button>
       </div>
@@ -329,10 +326,7 @@ export default function App() {
         />
       )}
 
-      {/* Footer */}
-      <footer className="footer">
-        <p>ResuMatch ATS Studio • Built with Python (FastAPI, Scikit-Learn, PyPDF) and React JS</p>
-      </footer>
+    
     </div>
   );
 }
