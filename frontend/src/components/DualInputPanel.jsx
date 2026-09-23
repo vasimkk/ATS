@@ -90,7 +90,7 @@ export default function DualInputPanel({
   };
 
   return (
-    <div style={{ maxWidth: '700px', margin: '0 auto' }}>
+    <div className="dual-panel-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px', maxWidth: '1100px', margin: '0 auto', justifyContent: 'center' }}>
       {/* Hidden File Input */}
       <input
         type="file"
@@ -320,6 +320,37 @@ export default function DualInputPanel({
               Clear File
             </button>
           )}
+        </div>
+      </div>
+
+      {/* Right Column: Target Job Description */}
+      <div className="glass-card input-panel">
+        <div className="panel-header">
+          <div className="panel-title">
+            <FileCode size={18} color="#0ea5e9" />
+            <span>Target Job Description</span>
+          </div>
+          {jdText && (
+            <button
+              type="button"
+              onClick={() => setJdText('')}
+              style={{ background: 'transparent', border: 'none', color: '#cbd5e1', cursor: 'pointer', fontSize: '0.8rem' }}
+            >
+              Clear
+            </button>
+          )}
+        </div>
+        <textarea
+          className="custom-textarea"
+          value={jdText}
+          onChange={(e) => setJdText(e.target.value)}
+          placeholder="Paste the job description here..."
+          rows={16}
+        />
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span className="panel-meta">
+            {jdText ? `${wordCount(jdText)} words` : 'Paste JD to start analysis'}
+          </span>
         </div>
       </div>
     </div>

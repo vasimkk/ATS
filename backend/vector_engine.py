@@ -220,3 +220,18 @@ vector_engine = VectorEmbeddingEngine()
 
 def get_vector_match(resume_text: str, jd_text: str) -> Dict[str, Any]:
     return vector_engine.compute_embedding_match(resume_text, jd_text)
+
+def get_semantic_similarity(text1: str, text2: str) -> float:
+    """
+    Computes a direct cosine similarity (0-100) between two text strings
+    using the dense vector embeddings.
+    """
+    if not text1.strip() or not text2.strip():
+        return 0.0
+        
+    vecs = vector_engine.vectorize_texts([text1, text2])
+    sim = float(cosine_similarity(vecs[0:1], vecs[1:2])[0][0])
+    
+    # Apply a modest curve to stretch semantic closeness
+    score = min(100.0, max(0.0, (max(0, sim) ** 0.5) * 100.0))
+    return round(score, 1)

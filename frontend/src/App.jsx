@@ -200,23 +200,22 @@ export default function App() {
       </section>
 
       {/* Primary Action Button Bar */}
-      <div className="action-bar">
+      <div className="action-bar" style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
         <button
-          onClick={handleBatchAnalyze}
-          disabled={isAnalyzing || isOptimizing || isBatchAnalyzing}
+          onClick={handleAnalyzeATS}
+          disabled={isAnalyzing || isOptimizing}
           className="btn-primary"
-          style={{ background: 'linear-gradient(135deg, #a855f7, #6366f1)' }}
         >
-          {isBatchAnalyzing ? (
-            <>
-              <div className="spinner" style={{ width: 18, height: 18, border: '2px solid #fff', borderTopColor: 'transparent', borderRadius: '50%' }} />
-              Scanning Job Database...
-            </>
+          {isAnalyzing ? (
+             <>
+               <div className="spinner" style={{ width: 18, height: 18, border: '2px solid #fff', borderTopColor: 'transparent', borderRadius: '50%' }} />
+               Analyzing Match...
+             </>
           ) : (
-            <>
-              <Sparkles size={18} />
-              Find Recommended Jobs
-            </>
+             <>
+               <BarChart3 size={18} />
+               Analyze Target JD Match
+             </>
           )}
         </button>
       </div>

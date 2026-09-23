@@ -18,7 +18,8 @@ from skills_taxonomy import (
     SKILLS_TAXONOMY
 )
 from parser import evaluate_ats_readability
-from vector_engine import get_vector_match
+from vector_engine import get_vector_match, get_semantic_similarity
+from llm_engine import evaluate_with_llm
 
 def compute_tfidf_similarity(resume_text: str, jd_text: str) -> float:
     """Compute semantic text overlap using TF-IDF and Cosine Similarity."""
@@ -72,6 +73,10 @@ def analyze_ats_match(resume_text: str, jd_text: str) -> Dict[str, Any]:
     # Flatten skills with canonicalization
     resume_skills_flat = {canonicalize_skill(s): s for skills in resume_skills_dict.values() for s in skills}
     jd_skills_flat = {canonicalize_skill(s): s for skills in jd_skills_dict.values() for s in skills}
+    
+    # Create canonical skill strings for the Matching Engine (F1 & F2)
+    resume_canonical_text = " ".join(resume_skills_flat.keys())
+    jd_canonical_text = " ".join(jd_skills_flat.keys())
 
     # Technical vs Soft Skills breakdown
     soft_cat_names = ["Soft Skills & Leadership"]
@@ -97,8 +102,8 @@ def analyze_ats_match(resume_text: str, jd_text: str) -> Dict[str, Any]:
     else:
         soft_score = 85.0
 
-    # 3. TF-IDF Semantic Content Score
-    semantic_score = compute_tfidf_similarity(resume_text, jd_text)
+    # 3. Dense Semantic Vector Content Score (F1 - now uses canonical skills per architecture, via all-MiniLM-L6-v2)
+    semantic_score = get_semantic_similarity(resume_canonical_text, jd_canonical_text)
 
     # 4. Experience & Education Alignment
     jd_years = extract_experience_years(jd_text)
@@ -134,26 +139,28 @@ def analyze_ats_match(resume_text: str, jd_text: str) -> Dict[str, Any]:
             exp_score = max(50.0, exp_score - 10.0)
             exp_notes.append("Degree requirements may need to be explicitly highlighted.")
 
-    # 5. Dense Vector Embeddings & Point-by-Point Resonance
-    vector_results = get_vector_match(resume_text, jd_text)
-    vector_score = vector_results["overall_vector_similarity"]
+    # 5. Generative LLM Deep Pass (replaces point-by-point resonance)
+    # Since the frontend UI for point-by-point was removed, we only need the overall score
+    llm_results = evaluate_with_llm(resume_text, jd_text)
+    vector_score = llm_results["score"]
+    llm_reasoning = llm_results["reasoning"]
 
     # 6. Overall Weighted ATS Score
     # User Formula: F1 (Cosine), F2 (Keyword Density), F3 (Skill Overlap) = 60%, F4 (Deep LLM pass) = 40%
     
-    # F1: Cosine Similarity
+    # F1: Cosine Similarity (using canonical skills)
     f1_cosine = semantic_score
     
-    # F2: Keyword Density (Simple word overlap percentage)
-    jd_words = set(re.findall(r'\b\w+\b', jd_text.lower()))
-    resume_words = set(re.findall(r'\b\w+\b', resume_text.lower()))
+    # F2: Keyword Density (using canonical skills text per architecture)
+    jd_words = set(re.findall(r'\b\w+\b', jd_canonical_text.lower()))
+    resume_words = set(re.findall(r'\b\w+\b', resume_canonical_text.lower()))
     f2_keyword = (len(jd_words.intersection(resume_words)) / max(len(jd_words), 1)) * 100
     f2_keyword = min(100.0, f2_keyword * 1.5) # Boost slightly for realistic scoring
     
     # F3: Skill Overlap (Average of tech and soft skills)
     f3_skill = (tech_score + soft_score) / 2
     
-    # F4: Deep LLM pass (Vector Embeddings)
+    # F4: Deep LLM pass (Generative LLM Score)
     f4_llm = vector_score
     
     # Calculate components
@@ -238,6 +245,9 @@ def analyze_ats_match(resume_text: str, jd_text: str) -> Dict[str, Any]:
             "message": f"Make sure your relevant career duration ({req_years}+ years) is prominently stated in your Executive Summary."
         })
 
+    # Get point-by-point vector analysis for debugging F1
+    vector_analysis_data = get_vector_match(resume_text, jd_text)
+
     return {
         "overall_score": overall_score,
         "grade": grade,
@@ -246,7 +256,7 @@ def analyze_ats_match(resume_text: str, jd_text: str) -> Dict[str, Any]:
         "metrics": {
             "technical_skills_match": tech_score,
             "vector_similarity": vector_score,
-            "vector_coverage": vector_results["coverage_percentage"],
+            "vector_coverage": 100.0,
             "semantic_similarity": semantic_score,
             "ats_readability": readability_score,
             "soft_skills_match": soft_score,
@@ -260,7 +270,7 @@ def analyze_ats_match(resume_text: str, jd_text: str) -> Dict[str, Any]:
             "f3_weight_20": round(f3_weight_20, 1),
             "f4_weight_40": round(f4_weight_40, 1)
         },
-        "vector_analysis": vector_results,
+        "llm_analysis": llm_results,
         "keywords": {
             "total_jd_skills": len(jd_skills_flat),
             "total_matched": len(matched_tech) + len(matched_soft),
@@ -270,6 +280,7 @@ def analyze_ats_match(resume_text: str, jd_text: str) -> Dict[str, Any]:
             "matched_by_category": matched_by_cat,
             "missing_by_category": missing_by_cat
         },
+        "vector_analysis": vector_analysis_data,
         "readability": readability_results,
         "experience_notes": exp_notes,
         "recommendations": recommendations
