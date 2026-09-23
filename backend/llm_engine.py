@@ -3,11 +3,11 @@ import urllib.request
 import urllib.error
 from typing import Dict, Any
 
-# Using a local Ollama instance (ollama.com does not host a public API endpoint)
-OLLAMA_API_KEY = "" # Not needed for local Ollama
-OLLAMA_CLOUD_URL = "http://localhost:11434/api/generate"
-# The user wants to use Qwen3 based on their previous prompt, or Phi/Llama. We'll set Qwen as the default.
-DEFAULT_MODEL = "qwen2.5" 
+# Using the official Ollama Cloud API endpoint
+OLLAMA_API_KEY = "1035054ec8774e2fa7756bdd0030d655.FCSW6gJ_nprwk93BXuTTItUc"
+OLLAMA_CLOUD_URL = "https://ollama.com/api/chat"
+# Using the specific cloud model requested by the user
+DEFAULT_MODEL = "gemma4:31b" 
 
 def evaluate_with_llm(resume_text: str, jd_text: str, model_name: str = DEFAULT_MODEL) -> Dict[str, Any]:
     """
@@ -33,12 +33,13 @@ Candidate Resume:
 
     data = {
         "model": model_name,
-        "prompt": prompt,
-        "stream": False,
-        "format": "json",
-        "options": {
-            "temperature": 0.1
-        }
+        "messages": [
+            {
+                "role": "user",
+                "content": prompt
+            }
+        ],
+        "stream": False
     }
 
     try:
@@ -53,9 +54,11 @@ Candidate Resume:
         
         with urllib.request.urlopen(req, timeout=45) as response:
             result = json.loads(response.read().decode('utf-8'))
-            response_text = result.get("response", "{}").strip()
+            # For the chat endpoint, the text is inside message.content
+            message_obj = result.get("message", {})
+            response_text = message_obj.get("content", "{}").strip()
             
-            # The model should return strict JSON due to format="json"
+            # The model should return strict JSON
             parsed = json.loads(response_text)
             
             score = parsed.get("score", 60)
