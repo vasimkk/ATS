@@ -186,6 +186,7 @@ class VectorEmbeddingEngine:
                     "jd_requirement": jd_p,
                     "matched_resume_bullet": resume_points[best_j],
                     "vector_similarity": match_pct,
+                    "raw_cosine": round(raw_sim, 4),
                     "status": status
                 })
 

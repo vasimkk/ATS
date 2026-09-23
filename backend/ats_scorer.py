@@ -152,8 +152,8 @@ def analyze_ats_match(resume_text: str, jd_text: str) -> Dict[str, Any]:
     f1_cosine = semantic_score
     
     # F2: Keyword Density (using canonical skills text per architecture)
-    jd_words = set(re.findall(r'\b\w+\b', jd_canonical_text.lower()))
-    resume_words = set(re.findall(r'\b\w+\b', resume_canonical_text.lower()))
+    jd_words = set(jd_skills_flat.keys())
+    resume_words = set(resume_skills_flat.keys())
     f2_keyword = (len(jd_words.intersection(resume_words)) / max(len(jd_words), 1)) * 100
     f2_keyword = min(100.0, f2_keyword * 1.5) # Boost slightly for realistic scoring
     
@@ -263,7 +263,15 @@ def analyze_ats_match(resume_text: str, jd_text: str) -> Dict[str, Any]:
             "experience_alignment": round(exp_score, 1),
             "f1_cosine": round(f1_cosine, 1),
             "f2_keyword": round(f2_keyword, 1),
+            "f2_jd_words": len(jd_words),
+            "f2_matched_words": len(jd_words.intersection(resume_words)),
+            "f2_matched_words_list": sorted(list(jd_words.intersection(resume_words))),
+            "f2_missing_words_list": sorted(list(jd_words - resume_words)),
             "f3_skill": round(f3_skill, 1),
+            "f3_matched_tech": len(matched_tech),
+            "f3_jd_tech": len(jd_tech_skills),
+            "f3_matched_soft": len(matched_soft),
+            "f3_jd_soft": len(jd_soft_skills),
             "f4_llm": round(f4_llm, 1),
             "f1_weight_20": round(f1_weight_20, 1),
             "f2_weight_20": round(f2_weight_20, 1),
