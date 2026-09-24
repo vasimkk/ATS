@@ -146,31 +146,31 @@ def analyze_ats_match(resume_text: str, jd_text: str) -> Dict[str, Any]:
     llm_reasoning = llm_results["reasoning"]
 
     # 6. Overall Weighted ATS Score
-    # User Formula: F1 (Cosine), F2 (Keyword Density), F3 (Skill Overlap) = 60%, F4 (Deep LLM pass) = 40%
+    # User Formula: F1 (Cosine), F2 (Skill Overlap), F3 (Keyword Density) = 60%, F4 (Deep LLM pass) = 40%
     
     # F1: Cosine Similarity (using canonical skills)
     f1_cosine = semantic_score
     
-    # F2: Keyword Density (using canonical skills text per architecture)
+    # F2: Skill Overlap (Average of tech and soft skills)
+    f2_skill = (tech_score + soft_score) / 2
+    
+    # F3: Keyword Density (using canonical skills text per architecture)
     jd_words = set(jd_skills_flat.keys())
     resume_words = set(resume_skills_flat.keys())
-    f2_keyword = (len(jd_words.intersection(resume_words)) / max(len(jd_words), 1)) * 100
-    f2_keyword = min(100.0, f2_keyword * 1.5) # Boost slightly for realistic scoring
-    
-    # F3: Skill Overlap (Average of tech and soft skills)
-    f3_skill = (tech_score + soft_score) / 2
+    f3_keyword = (len(jd_words.intersection(resume_words)) / max(len(jd_words), 1)) * 100
+    f3_keyword = min(100.0, f3_keyword * 1.5) # Boost slightly for realistic scoring
     
     # F4: Deep LLM pass (Generative LLM Score)
     f4_llm = vector_score
     
     # Calculate components
-    # F1, F2, F3 each get 20% weight (total 60%), F4 gets 40% weight (total 100%)
-    f1_weight_20 = f1_cosine * 0.20
-    f2_weight_20 = f2_keyword * 0.20
-    f3_weight_20 = f3_skill * 0.20
+    # Weights: F1 (30%), F2 (18%), F3 (12%), F4 (40%)
+    f1_weight_30 = f1_cosine * 0.30
+    f2_weight_18 = f2_skill * 0.18
+    f3_weight_12 = f3_keyword * 0.12
     f4_weight_40 = f4_llm * 0.40
     
-    overall_score = round(f1_weight_20 + f2_weight_20 + f3_weight_20 + f4_weight_40)
+    overall_score = round(f1_weight_30 + f2_weight_18 + f3_weight_12 + f4_weight_40)
     overall_score = max(0, min(100, overall_score))
 
     # Grade determination
@@ -262,20 +262,20 @@ def analyze_ats_match(resume_text: str, jd_text: str) -> Dict[str, Any]:
             "soft_skills_match": soft_score,
             "experience_alignment": round(exp_score, 1),
             "f1_cosine": round(f1_cosine, 1),
-            "f2_keyword": round(f2_keyword, 1),
-            "f2_jd_words": len(jd_words),
-            "f2_matched_words": len(jd_words.intersection(resume_words)),
-            "f2_matched_words_list": sorted(list(jd_words.intersection(resume_words))),
-            "f2_missing_words_list": sorted(list(jd_words - resume_words)),
-            "f3_skill": round(f3_skill, 1),
-            "f3_matched_tech": len(matched_tech),
-            "f3_jd_tech": len(jd_tech_skills),
-            "f3_matched_soft": len(matched_soft),
-            "f3_jd_soft": len(jd_soft_skills),
+            "f2_skill": round(f2_skill, 1),
+            "f2_matched_tech": len(matched_tech),
+            "f2_jd_tech": len(jd_tech_skills),
+            "f2_matched_soft": len(matched_soft),
+            "f2_jd_soft": len(jd_soft_skills),
+            "f3_keyword": round(f3_keyword, 1),
+            "f3_jd_words": len(jd_words),
+            "f3_matched_words": len(jd_words.intersection(resume_words)),
+            "f3_matched_words_list": sorted(list(jd_words.intersection(resume_words))),
+            "f3_missing_words_list": sorted(list(jd_words - resume_words)),
             "f4_llm": round(f4_llm, 1),
-            "f1_weight_20": round(f1_weight_20, 1),
-            "f2_weight_20": round(f2_weight_20, 1),
-            "f3_weight_20": round(f3_weight_20, 1),
+            "f1_weight_30": round(f1_weight_30, 1),
+            "f2_weight_18": round(f2_weight_18, 1),
+            "f3_weight_12": round(f3_weight_12, 1),
             "f4_weight_40": round(f4_weight_40, 1)
         },
         "llm_analysis": llm_results,

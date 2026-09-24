@@ -98,15 +98,15 @@ export default function MatchReport({ atsData, parsedResumeData, onNavigateToTai
                 <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', marginTop: 8, display: 'flex', flexDirection: 'column', gap: 6 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span>F1 (Cosine Similarity):</span>
-                    <strong>{metrics.f1_weight_20} / 20 pts</strong>
+                    <strong>{metrics.f1_weight_30} / 30 pts</strong>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>F2 (Keyword Density):</span>
-                    <strong>{metrics.f2_weight_20} / 20 pts</strong>
+                    <span>F2 (Skill Overlap):</span>
+                    <strong>{metrics.f2_weight_18} / 18 pts</strong>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span>F3 (Skill Overlap):</span>
-                    <strong>{metrics.f3_weight_20} / 20 pts</strong>
+                    <span>F3 (Keyword Density):</span>
+                    <strong>{metrics.f3_weight_12} / 12 pts</strong>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span>F4 (Deep LLM Pass):</span>
@@ -115,7 +115,7 @@ export default function MatchReport({ atsData, parsedResumeData, onNavigateToTai
                   <div style={{ width: '100%', height: 1, background: 'rgba(255,255,255,0.1)', margin: '4px 0' }} />
                   <div style={{ display: 'flex', justifyContent: 'space-between', color: '#10b981', fontWeight: 'bold' }}>
                     <span>Total ATS Score (F1 + F2 + F3 + F4):</span>
-                    <strong>{metrics.f1_weight_20} + {metrics.f2_weight_20} + {metrics.f3_weight_20} + {metrics.f4_weight_40} = {overall_score}%</strong>
+                    <strong>{metrics.f1_weight_30} + {metrics.f2_weight_18} + {metrics.f3_weight_12} + {metrics.f4_weight_40} = {overall_score}%</strong>
                   </div>
                 </div>
               </div>
@@ -147,14 +147,14 @@ export default function MatchReport({ atsData, parsedResumeData, onNavigateToTai
           alignItems: 'center'
         }}>
           <span>Score Calculation:</span>
-          <strong>{metrics.f1_weight_20} + {metrics.f2_weight_20} + {metrics.f3_weight_20} + {metrics.f4_weight_40} = {overall_score}%</strong>
+          <strong>{metrics.f1_weight_30} + {metrics.f2_weight_18} + {metrics.f3_weight_12} + {metrics.f4_weight_40} = {overall_score}%</strong>
         </div>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12 }}>
           <div className="checklist-item">
             <div className="checklist-icon"><CheckCircle2 size={18} color="#38bdf8" /></div>
             <div className="checklist-body">
-              <h4 style={{ color: '#38bdf8' }}>F1: Dense Vector Similarity (20%)</h4>
+              <h4 style={{ color: '#38bdf8' }}>F1: Dense Vector Similarity (30%)</h4>
               <p>Extracts your core skills and pushes them through a 384-dimensional semantic space to measure their conceptual distance to the job description.</p>
               <div style={{ marginTop: '8px', fontSize: '0.8rem', color: '#94a3b8', background: 'rgba(255,255,255,0.05)', padding: '8px', borderRadius: '4px', fontFamily: 'monospace' }}>
                 <div style={{ marginBottom: '6px', color: '#7dd3fc', borderBottom: '1px dashed rgba(255,255,255,0.2)', paddingBottom: '4px' }}>
@@ -166,56 +166,56 @@ export default function MatchReport({ atsData, parsedResumeData, onNavigateToTai
                   <em>Curve Formula: √(max(0, {vector_analysis?.vector_stats?.cosine_similarity || 0})) * 100</em>
                 </div>
                 <strong style={{ color: '#bae6fd' }}>Step 1:</strong> Curved Base Score = {metrics.f1_cosine}/100<br />
-                <strong style={{ color: '#bae6fd' }}>Step 2:</strong> Apply 20% Weight: {metrics.f1_cosine} * 0.20 = <strong style={{ color: '#fff' }}>{metrics.f1_weight_20} pts</strong>
+                <strong style={{ color: '#bae6fd' }}>Step 2:</strong> Apply 30% Weight: {metrics.f1_cosine} * 0.30 = <strong style={{ color: '#fff' }}>{metrics.f1_weight_30} pts</strong>
               </div>
             </div>
           </div>
           <div className="checklist-item">
             <div className="checklist-icon"><CheckCircle2 size={18} color="#38bdf8" /></div>
             <div className="checklist-body">
-              <h4 style={{ color: '#38bdf8' }}>F2: Keyword Density (20%)</h4>
-              <p>Calculates the raw word-for-word overlap density between your resume and the exact vocabulary used by the hiring manager.</p>
-              <div style={{ marginTop: '8px', fontSize: '0.8rem', color: '#94a3b8', background: 'rgba(255,255,255,0.05)', padding: '8px', borderRadius: '4px', fontFamily: 'monospace' }}>
-                <div style={{ marginBottom: '6px', color: '#7dd3fc', borderBottom: '1px dashed rgba(255,255,255,0.2)', paddingBottom: '4px' }}>
-                  <strong>Keyword Density Math (Debug):</strong><br/>
-                  Total Unique JD Words = {metrics.f2_jd_words || 0}<br/>
-                  Matched Resume Words = {metrics.f2_matched_words || 0}<br/>
-                  <em>Formula: (Matched / JD Words) * 100 * 1.5 Multiplier</em>
-
-                  {metrics.f2_matched_words_list && (
-                    <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px dashed rgba(255,255,255,0.1)' }}>
-                      <strong style={{ color: '#10b981', display: 'block', marginBottom: '4px', fontSize: '0.75rem' }}>Matched Words (F2 Component):</strong>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '8px' }}>
-                        {metrics.f2_matched_words_list.map((w, i) => <span key={i} style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem' }}>{w}</span>)}
-                      </div>
-                      
-                      <strong style={{ color: '#fb7185', display: 'block', marginBottom: '4px', fontSize: '0.75rem' }}>Missing Words (F2 Component):</strong>
-                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-                        {metrics.f2_missing_words_list?.map((w, i) => <span key={i} style={{ background: 'rgba(244, 63, 94, 0.15)', color: '#fb7185', padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem' }}>{w}</span>)}
-                      </div>
-                    </div>
-                  )}
-                </div>
-                <strong style={{ color: '#bae6fd' }}>Step 1:</strong> Base Keyword Density = {metrics.f2_keyword}/100<br />
-                <strong style={{ color: '#bae6fd' }}>Step 2:</strong> Apply 20% Weight: {metrics.f2_keyword} * 0.20 = <strong style={{ color: '#fff' }}>{metrics.f2_weight_20} pts</strong>
-              </div>
-            </div>
-          </div>
-
-          <div className="checklist-item">
-            <div className="checklist-icon"><CheckCircle2 size={18} color="#38bdf8" /></div>
-            <div className="checklist-body">
-              <h4 style={{ color: '#38bdf8' }}>F3: Skill Overlap (20%)</h4>
+              <h4 style={{ color: '#38bdf8' }}>F2: Skill Overlap (18%)</h4>
               <p>A direct, taxonomy-based evaluation mapping how many explicit hard and soft skills requested in the JD are present in your resume.</p>
               <div style={{ marginTop: '8px', fontSize: '0.8rem', color: '#94a3b8', background: 'rgba(255,255,255,0.05)', padding: '8px', borderRadius: '4px', fontFamily: 'monospace' }}>
                 <div style={{ marginBottom: '6px', color: '#7dd3fc', borderBottom: '1px dashed rgba(255,255,255,0.2)', paddingBottom: '4px' }}>
                   <strong>Skill Overlap Math (Debug):</strong><br/>
-                  Tech Match = ({metrics.f3_matched_tech || 0} Matched / {metrics.f3_jd_tech || 0} Total JD Tech Skills) * 100 = {metrics.technical_skills_match}%<br/>
-                  Soft Match = ({metrics.f3_matched_soft || 0} Matched / {metrics.f3_jd_soft || 0} Total JD Soft Skills) * 100 = {metrics.soft_skills_match}%<br/>
+                  Tech Match = ({metrics.f2_matched_tech || 0} Matched / {metrics.f2_jd_tech || 0} Total JD Tech Skills) * 100 = {metrics.technical_skills_match}%<br/>
+                  Soft Match = ({metrics.f2_matched_soft || 0} Matched / {metrics.f2_jd_soft || 0} Total JD Soft Skills) * 100 = {metrics.soft_skills_match}%<br/>
                   <em>Formula: Average(Tech Match, Soft Match)</em>
                 </div>
-                <strong style={{ color: '#bae6fd' }}>Step 1:</strong> Base Skill Overlap = {metrics.f3_skill}/100<br />
-                <strong style={{ color: '#bae6fd' }}>Step 2:</strong> Apply 20% Weight: {metrics.f3_skill} * 0.20 = <strong style={{ color: '#fff' }}>{metrics.f3_weight_20} pts</strong>
+                <strong style={{ color: '#bae6fd' }}>Step 1:</strong> Base Skill Overlap = {metrics.f2_skill}/100<br />
+                <strong style={{ color: '#bae6fd' }}>Step 2:</strong> Apply 18% Weight: {metrics.f2_skill} * 0.18 = <strong style={{ color: '#fff' }}>{metrics.f2_weight_18} pts</strong>
+              </div>
+            </div>
+          </div>
+
+          <div className="checklist-item">
+            <div className="checklist-icon"><CheckCircle2 size={18} color="#38bdf8" /></div>
+            <div className="checklist-body">
+              <h4 style={{ color: '#38bdf8' }}>F3: Keyword Density (12%)</h4>
+              <p>Calculates the raw word-for-word overlap density between your resume and the exact vocabulary used by the hiring manager.</p>
+              <div style={{ marginTop: '8px', fontSize: '0.8rem', color: '#94a3b8', background: 'rgba(255,255,255,0.05)', padding: '8px', borderRadius: '4px', fontFamily: 'monospace' }}>
+                <div style={{ marginBottom: '6px', color: '#7dd3fc', borderBottom: '1px dashed rgba(255,255,255,0.2)', paddingBottom: '4px' }}>
+                  <strong>Keyword Density Math (Debug):</strong><br/>
+                  Total Unique JD Words = {metrics.f3_jd_words || 0}<br/>
+                  Matched Resume Words = {metrics.f3_matched_words || 0}<br/>
+                  <em>Formula: (Matched / JD Words) * 100 * 1.5 Multiplier</em>
+
+                  {metrics.f3_matched_words_list && (
+                    <div style={{ marginTop: '10px', paddingTop: '10px', borderTop: '1px dashed rgba(255,255,255,0.1)' }}>
+                      <strong style={{ color: '#10b981', display: 'block', marginBottom: '4px', fontSize: '0.75rem' }}>Matched Words (F3 Component):</strong>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginBottom: '8px' }}>
+                        {metrics.f3_matched_words_list.map((w, i) => <span key={i} style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem' }}>{w}</span>)}
+                      </div>
+                      
+                      <strong style={{ color: '#fb7185', display: 'block', marginBottom: '4px', fontSize: '0.75rem' }}>Missing Words (F3 Component):</strong>
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                        {metrics.f3_missing_words_list?.map((w, i) => <span key={i} style={{ background: 'rgba(244, 63, 94, 0.15)', color: '#fb7185', padding: '2px 6px', borderRadius: '4px', fontSize: '0.7rem' }}>{w}</span>)}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <strong style={{ color: '#bae6fd' }}>Step 1:</strong> Base Keyword Density = {metrics.f3_keyword}/100<br />
+                <strong style={{ color: '#bae6fd' }}>Step 2:</strong> Apply 12% Weight: {metrics.f3_keyword} * 0.12 = <strong style={{ color: '#fff' }}>{metrics.f3_weight_12} pts</strong>
               </div>
             </div>
           </div>
@@ -244,7 +244,7 @@ export default function MatchReport({ atsData, parsedResumeData, onNavigateToTai
           <span>Deep Debugging: Keyword Matches</span>
         </h3>
         <p style={{ color: 'var(--text-muted)', fontSize: '0.86rem', marginBottom: 12 }}>
-          Detailed breakdown of exact skills found vs. missing. These directly drive the F2 (Keyword Density) and F3 (Skill Overlap) scores.
+          Detailed breakdown of exact skills found vs. missing. These directly drive the F3 (Keyword Density) and F2 (Skill Overlap) scores.
         </p>
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
