@@ -79,3 +79,50 @@ Candidate Resume:
             "score": 65, 
             "reasoning": f"Deep LLM pass failed with the Ollama Cloud API. Error: {str(e)}"
         }
+
+def generate_action_verbs(target_role: str = "", model_name: str = DEFAULT_MODEL) -> list:
+    """
+    Dynamically generates action verbs tailored to the target role using the LLM.
+    """
+    prompt = f"""You are an expert technical recruiter.
+Provide exactly 10 strong, past-tense action verbs (like 'Architected', 'Spearheaded') tailored for a {target_role or 'Software Professional'} role.
+Return ONLY a valid JSON list of strings, with no extra text or markdown.
+Example: ["Architected", "Engineered", "Optimized", ...]
+"""
+
+    data = {
+        "model": model_name,
+        "messages": [
+            {"role": "user", "content": prompt}
+        ],
+        "stream": False
+    }
+
+    fallback_verbs = [
+        "Architected", "Engineered", "Spearheaded", "Pioneered", "Implemented",
+        "Optimized", "Scaled", "Streamlined", "Automated", "Delivered"
+    ]
+
+    try:
+        req = urllib.request.Request(
+            OLLAMA_CLOUD_URL, 
+            data=json.dumps(data).encode('utf-8'),
+            headers={
+                'Content-Type': 'application/json',
+                'Authorization': f'Bearer {OLLAMA_API_KEY}'
+            }
+        )
+        
+        with urllib.request.urlopen(req, timeout=15) as response:
+            result = json.loads(response.read().decode('utf-8'))
+            message_obj = result.get("message", {})
+            response_text = message_obj.get("content", "[]").strip()
+            
+            parsed = json.loads(response_text)
+            if isinstance(parsed, list) and len(parsed) > 0:
+                return parsed
+            return fallback_verbs
+            
+    except Exception as e:
+        print(f"Ollama Action Verbs Error: {str(e)}")
+        return fallback_verbs

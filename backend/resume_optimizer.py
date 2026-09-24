@@ -9,11 +9,11 @@ from typing import Dict, Any, List, Optional
 from skills_taxonomy import (
     extract_skills_from_text,
     find_category_for_skill,
-    canonicalize_skill,
-    ACTION_VERBS
+    canonicalize_skill
 )
 from parser import extract_contact_info, detect_sections
 from ats_scorer import analyze_ats_match
+from llm_engine import generate_action_verbs
 
 # Metric templates for impactful STAR bullet generation
 METRIC_TEMPLATES = [
@@ -71,7 +71,8 @@ def generate_tailored_summary(
 
 def generate_star_bullets(
     missing_skills: List[str],
-    existing_bullets: List[str]
+    existing_bullets: List[str],
+    target_role: str = ""
 ) -> List[Dict[str, str]]:
     """
     Generate or upgrade existing bullet points into STAR formatted bullets
@@ -90,6 +91,8 @@ def generate_star_bullets(
         ("Collaborated cross-functionally to standardize {skill} best practices, {metric}.", "Engineering Excellence")
     ]
     
+    dynamic_action_verbs = generate_action_verbs(target_role)
+
     # If we have existing bullets, upgrade them
     for i, orig_b in enumerate(existing_bullets[:6]):
         clean_b = re.sub(r'^[•\-\*\s]+', '', orig_b).strip()
@@ -97,7 +100,7 @@ def generate_star_bullets(
             continue
             
         skill_insert = skills_to_use.pop(0) if skills_to_use else None
-        action_verb = ACTION_VERBS[i % len(ACTION_VERBS)]
+        action_verb = dynamic_action_verbs[i % len(dynamic_action_verbs)]
         metric = METRIC_TEMPLATES[i % len(METRIC_TEMPLATES)]
         
         if skill_insert:
@@ -186,7 +189,8 @@ def optimize_resume(
     
     tailored_bullets = generate_star_bullets(
         missing_skills=missing_skills,
-        existing_bullets=raw_bullets
+        existing_bullets=raw_bullets,
+        target_role=detected_role
     )
     
     resume_skills_dict = extract_skills_from_text(resume_text)

@@ -14,8 +14,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 from skills_taxonomy import (
     extract_skills_from_text,
     canonicalize_skill,
-    find_category_for_skill,
-    SKILLS_TAXONOMY
+    find_category_for_skill
 )
 from parser import evaluate_ats_readability
 from vector_engine import get_vector_match, get_semantic_similarity
